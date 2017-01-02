@@ -18,9 +18,6 @@
 			</div>
 		</header>
 		<router-view></router-view>
-		<footer class='footer'>
-			Forum.
-		</footer>
 	</div>
 </template>
 
@@ -41,63 +38,16 @@
 
 <style lang='scss'>
 	@import url('https://fonts.googleapis.com/css?family=Lato:300,300i,400|Montserrat');
+	@import './assets/scss/variables.scss';
 
-	$font--role-default: 'Lato', sans-serif;
-	$font--role-emphasis: 'Montserrat', sans-serif;
-
-	$color__text--primary: rgba(0, 0, 0, 0.87);
-	$color__text--secondary: rgba(0, 0, 0, 0.54);
-
-	$color__lightgray--primary: #F5F5F5;
-	$color__lightgray--darker: #EEEEEE;
-	$color__lightgray--darkest: #E0E0E0;
-
-	$color__gray--primary: #EEEEEE;
-	$color__gray--darker: #E0E0E0;
-	$color__gray--darkest: #BDBDBD;
-
-	@mixin text($family: $font--role-default, $size: 1rem, $weight: 300) {
-		font-family: $family;
-		font-size: $size;
-		font-weight: $weight;
-	}
-
-	@mixin optional-at-root($sel) {
-		@at-root #{if(not &, $sel, selector-append(&, $sel))} {
-			@content;
-		}
-	}
-
-	@mixin placeholder {
-		@include optional-at-root('::-webkit-input-placeholder') {
-			@content;
-		}
-
-		@include optional-at-root(':-moz-placeholder') {
-			@content;
-		}
-
-		@include optional-at-root('::-moz-placeholder') {
-			@content;
-		}
-
-		@include optional-at-root(':-ms-input-placeholder') {
-			@content;
-		}
-	}
-	html {
+	html, body {
 		width: 100%;
+		height: 100%;
 		margin: 0;
 		padding: 0;
-		position: relative;
-		min-height: 100%;
 
 		color: $color__text--primary;
 		@include text;	
-	}
-
-	body {
-		margin: 0 0 2rem;
 	}
 
 	* {
@@ -145,8 +95,17 @@
 			border-color: $color__gray--darkest;
 		}
 
+		@at-root #{&}__icon {
+		}
+
 		@at-root #{&}--borderless {
 			border: 0;
+		}
+
+		@at-root #{&}--orange {
+			border-color: $color__orange--primary;
+			&:hover { border-color: $color__orange--darker; }
+			&:active { border-color: $color__orange--darkest; }
 		}
 	}
 
@@ -171,18 +130,5 @@
 				@include text;
 			}
 		}
-	}
-
-	.footer {
-		position: absolute;
-		left: 0;
-		bottom: 0;
-		text-align: center;
-		color: $color__text--secondary;
-		font-size: 0.85rem;
-		height: 1rem;
-		margin-bottom: 0.2rem;
-		border-top: thin solid $color__lightgray--darkest;
-		width: 100%;
 	}
 </style>
