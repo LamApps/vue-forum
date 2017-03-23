@@ -1,0 +1,31 @@
+@import './variables.scss';
+
+pre {
+	background-color: $color__gray--primary;
+	padding: 0.5rem;
+}
+
+a {
+	font-weight: 500;
+	color: $color__darkgray--darker;
+	position: relative;
+	    background: url(data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAQAAAC1HAwCAAAAC0lEQVR42mNkqAcAAIUAgUW0RjgAAAAASUVORK5CYII=) repeat-x 100% 100%;
+	    text-decoration: none;
+
+
+ 	&:hover, &:visited {
+ 		color: $color__darkgray--primary;
+ 	}
+ 	&:active {
+ 		color: $color__darkgray--darker;
+ 	}
+}
+
+blockquote {
+	background-color: $color__gray--primary;
+	border-left: thick solid $color__gray--darkest;
+
+	& * {
+		padding: 0.5rem;
+	}
+}
