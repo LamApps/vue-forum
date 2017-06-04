@@ -36,6 +36,36 @@ router.all('*', (req, res, next) => {
 	}
 })
 
+router.delete('/:post_id', async (req, res) => {
+	try {
+		if(!req.session.admin) {
+			throw Errors.requestNotAuthorized
+		} else {
+			let post = await Post.findById(req.params.post_id)
+			if(!post) throw Errors.invalidParameter('postId', 'post does not exist')
+
+			await post.update({ content: '[This post has been removed by an administrator]', removed: true })
+
+			res.json({ success: true })
+		}
+	} catch (e) {
+		if(e.name === 'requestNotAuthorized') {
+			res.status(401)
+			res.json({ errors: [e] })
+		} else if(e.name === 'invalidParameter') {
+			res.status(400)
+			res.json({ errors: [e] })
+		} else {
+			console.log(e)
+
+			res.status(500)
+			res.json({
+				errors: [Errors.unknown]
+			})
+		}
+	}
+})
+
 router.put('/:post_id/like', async (req, res) => {
 	try {
 		let post = await Post.findById(req.params.post_id)
@@ -140,6 +170,8 @@ router.post('/', async (req, res) => {
 				throw Errors.invalidParameter('replyingToId', 'post does not exist')
 			} else if(replyingToPost.Thread.id !== thread.id) {
 				throw Errors.invalidParameter('replyingToId', 'replies must be in same thread')
+			} else if (replyingToPost.removed) {
+				throw Errors.postRemoved
 			} else {
 				post = await Post.create({ content: req.body.content, postNumber: thread.postsCount })
 
@@ -206,7 +238,7 @@ router.post('/', async (req, res) => {
 			res.json({
 				errors: validationErrors
 			})
-		} else if(e.name === 'invalidParameter' || e.name === 'threadLocked') {
+		} else if(['invalidParameter', 'threadLocked', 'postRemoved'].indexOf(e.name) > -1) {
 			res.status(400)
 			res.json({
 				errors: [e]

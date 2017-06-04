@@ -671,4 +671,96 @@ describe('Thread and post', () => {
 			}
 		})
 	})
+
+	describe('DELETE /post/:id', () => {
+		let threadId
+		let postId
+		let normalUserAgent = chai.request.agent(server)
+
+		before(done => {
+			userAgent
+				.post('/api/v1/thread')
+				.set('content-type', 'application/json')
+				.send({
+					name: 'delete_post_thread',
+					category: 'CATEGORY_NAME'
+				})
+				.then(res => {
+					threadId = res.body.id
+
+					return userAgent
+						.post('/api/v1/post')
+						.set('content-type', 'application/json')
+						.send({
+							content: 'test content here',
+							threadId
+						})
+				})
+				.then(res => {
+					postId = res.body.id
+
+					return normalUserAgent
+						.post('/api/v1/user')
+						.set('content-type', 'application/json')
+						.send({
+							username: 'delete_post_non_admin',
+							password: 'password'
+						})
+				})
+				.then(_ => {
+					done()
+				})
+				.catch(done)
+		})
+
+		it('should remove the post', async () => {
+			let res = await userAgent.delete('/api/v1/post/' + postId)
+
+			res.should.be.json
+			res.should.have.status(200)
+			res.body.should.have.property('success', true)
+
+			let post = await userAgent.get('/api/v1/post/' + postId)
+
+			post.body.should.have.property('removed', true)
+			post.body.should.have.property('content', '<p>[This post has been removed by an administrator]</p>\n')
+		})
+		it('should return an error if trying to reply to a removed post', async () => {
+			replyAgent
+				.post('/api/v1/post')
+				.set('content-type', 'application/json')
+				.send({
+					content: 'reply to deleted post',
+					replyId: postId,
+					threadId
+				})
+				.end((err, res) => {
+					res.should.be.json
+					res.should.have.status(400)
+					res.body.errors.should.include.something.that.deep.equals(Errors.postRemoved)
+				})
+		})
+		it('should return an error if post does not exist', done => {
+			userAgent
+				.delete('/api/v1/post/not_a_post')
+				.end((err, res) => {
+					res.should.be.json
+					res.should.have.status(400)
+					res.body.errors.should.include.something.that.deep.equals(Errors.invalidParameter('postId', 'post does not exist'))
+
+					done()
+				})
+		})
+		it('should return an error if not an admin', done => {
+			normalUserAgent
+				.delete('/api/v1/post/' + postId)
+				.end((err, res) => {
+					res.should.be.json
+					res.should.have.status(401)
+					res.body.errors.should.contain.something.that.deep.equals(Errors.requestNotAuthorized)
+
+					done()
+				})
+		})
+	})
 })
