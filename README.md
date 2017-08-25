@@ -1,3 +1,18 @@
-# forum-backend
+# frontend
 
-This is the backend (or 'api component') of the forum software to go along with the corresponding [frontend project](//github.com/sbkwgh/forum-frontend).
+> Frontend for forum
+
+## Build Setup
+
+``` bash
+# install dependencies
+npm install
+
+# serve with hot reload at localhost:8080
+npm run dev
+
+# build for production with minification
+npm run build
+```
+
+For detailed explanation on how things work, checkout the [guide](http://vuejs-templates.github.io/webpack/) and [docs for vue-loader](http://vuejs.github.io/vue-loader).
