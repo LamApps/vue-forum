@@ -3,7 +3,7 @@
 		<div class='user_threads__title'>Threads by {{username}}</div>
 
 		<template v-if='!threads'>
-			<thread-display-placeholder v-for='n in 10' :key='n'>
+			<thread-display-placeholder v-for='n in 10'>
 			</thread-display-placeholder>
 		</template>
 		
@@ -15,12 +15,10 @@
 			message='threads'
 			v-else-if='threads.length'
 		>
-			<thread-display v-for='thread in threads' :key='thread.id' :thread='thread'></thread-display>
+			<thread-display v-for='thread in threads' :thread='thread'></thread-display>
 			<thread-display-placeholder
 				v-if='loadingThreads'
-				
 				v-for='n in nextThreadsCount'
-				:key='n'
 			></thread-display-placeholder>
 		</scroll-load>
 

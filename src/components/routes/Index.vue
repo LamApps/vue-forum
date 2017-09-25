@@ -21,8 +21,6 @@
 				</div>
 				<router-link
 					v-for='category in categories'
-					:key='category.value'
-
 					class='threads_main__side_bar__menu_item'
 					:class='{"threads_main__side_bar__menu_item--selected": category.value === selectedCategory}'
 					:to='"/category/" + category.value'
@@ -57,12 +55,12 @@
 					:loading='loading'
 					@loadNext='getThreads'
 				>
-					<thread-display-placeholder v-for='n in newThreads' v-if='loadingNewer' :key='n'></thread-display-placeholder>
+					<thread-display-placeholder v-for='n in newThreads' v-if='loadingNewer'></thread-display-placeholder>
 					<div class='threads_main__load_new' v-if='newThreads' @click='getNewerThreads'>
 						Load {{newThreads}} new {{newThreads | pluralize('thread')}}</span>
 					</div>
-					<thread-display v-for='thread in filteredThreads' :thread='thread' :key='thread.id'></thread-display>
-					<thread-display-placeholder v-for='n in nextThreadsCount' :key='n' v-if='loading'></thread-display-placeholder>
+					<thread-display v-for='thread in filteredThreads' :thread='thread'></thread-display>
+					<thread-display-placeholder v-for='n in nextThreadsCount' v-if='loading'></thread-display-placeholder>
 				</scroll-load>
 
 				<div key='no threads' v-else class='threads_main__threads overlay_message'>
@@ -310,7 +308,7 @@
 			background-image: none;
 			font-weight: 300;
 
-			@at-root #{&}__border {
+			#{&}__border {
 				display: inline-block;
 				height: 0.75rem;
 				width: 0.75rem;
@@ -329,13 +327,13 @@
 				filter: brightness(0.8);
 			}
 
-			@at-root #{&}__text {
+			#{&}__text {
 				filter: saturate(0.75), brightness(0.75);
 			}
 			
 
-			@at-root #{&}--selected {
-				font-weight: normal;
+			#{&}--selected {
+				font-weight: bold;
 
 				.threads_main__side_bar__menu_item__border {
 					opacity: 1;
