@@ -61,7 +61,7 @@
 		</div>
 		<div class='editor' :class='{"editor--focus": focusInput}'>
 			<div class='editor__input'>
-				<div class='editor__format_bar'>
+				<div class='editor__format_bar editor__format_bar--editor'>
 					editor
 				</div>
 				<input-editor-core
@@ -184,9 +184,9 @@
 					errors.push({name: 'name', error: 'Cannot be blank'})
 				} if(this.showPoll && !this.pollQuestion.trim().length) {
 					errors.push({name: 'pollQuestion', error: 'Cannot be blank'})
-			 	} if (this.pollAnswers.length < 2) {
+			 	} if (this.showPoll && this.pollAnswers.length < 2) {
 			 		errors.push({name: 'pollAnswer', error: 'You need at least 2 answers'})
-				} if (this.hasDuplicates(this.pollAnswers, i => i.answer)) {
+				} if (this.showPoll && this.hasDuplicates(this.pollAnswers, i => i.answer)) {
 			 		errors.push({name: 'pollAnswer', error: 'Your answers can\'t contain any duplicates'})
 				} if(errors.length) {
 					this.setErrors(errors)
@@ -355,6 +355,13 @@
 			justify-content: flex-end;
 			align-items: center;
 			font-variant: small-caps;
+
+			@at-root #{&}--preview {
+				border-radius: 0 0.25rem 0 0;
+			}
+			@at-root #{&}--editor {
+				border-radius: 0.25rem 0 0 0;
+			}
 		}
 
 		@at-root #{&}__input {
