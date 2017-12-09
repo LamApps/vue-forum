@@ -135,6 +135,7 @@
 					showRemoveProfilePictureModal: false,
 					dragging: false,
 					dataURL: null,
+					file: null,
 					loading: false
 				}
 			}
@@ -163,13 +164,18 @@
 			uploadProfilePicture () {
 				this.picture.loading = true
 
+				let formData = new FormData()
+				formData.append('picture', this.picture.file)
+
 				this.axios
-					.post('/api/v1/user/' + this.$store.state.username + '/picture', {
-						picture: this.picture.dataURL
+					.post('/api/v1/user/' + this.$store.state.username + '/picture', formData, {
+						headers: {
+							'Content-Type': 'multipart/form-data'
+						}
 					})
 					.then(res => {
 						this.hideProflePictureModal()
-						this.picture.current = this.picture.dataURL
+						this.picture.current = res.data.picture
 					})
 					.catch(e => {
 						this.picture.loading = false
@@ -180,9 +186,7 @@
 			},
 			removeProfilePicture () {
 				this.axios
-					.post('/api/v1/user/' + this.$store.state.username + '/picture', {
-						picture: null
-					})
+					.delete('/api/v1/user/' + this.$store.state.username + '/picture')
 					.then(res => {
 						this.picture.current = null
 					})
@@ -215,8 +219,9 @@
 			},
 			processImage (file) {
 				let reader = new FileReader()
-
 				reader.readAsDataURL(file)
+
+				this.picture.file = file
 
 				reader.addEventListener('load', () => {
 					this.picture.dataURL = reader.result
