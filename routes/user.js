@@ -1,12 +1,9 @@
 let bcrypt = require('bcryptjs')
-let multer = require('multer')
 let express = require('express')
 let router = express.Router()
 
 const Errors = require('../lib/errors.js')
-let {
-	User, Post, ProfilePicture, AdminToken, Thread, Category, Sequelize, Ip, Ban
-} = require('../models')
+let { User, Post, AdminToken, Thread, Category, Sequelize, Ip, Ban } = require('../models')
 let pagination = require('../lib/pagination.js')
 
 function setUserSession(req, res, username, UserId, admin) {
@@ -175,46 +172,6 @@ router.post('/:username/logout', async (req, res) => {
 	})
 })
 
-router.get('/:username/picture', async (req, res) => {
-	try {
-		let user = await User.findOne({
-			where: {
-				username: req.params.username
-			}
-		})
-		if(!user) throw Errors.accountDoesNotExist
-
-		let picture = await ProfilePicture.findOne({
-			where: {
-				UserId: user.id
-			}
-		})
-
-		if(!picture) {
-			res.status(404)
-			res.end('')
-		} else {
-			res.writeHead(200, {
-				'Content-Type': picture.mimetype,
-				'Content-disposition': 'attachment;filename=profile',
-				'Content-Length': picture.file.length
-			})
-			res.end(new Buffer(picture.file, 'binary'))
-		}
-	} catch (e) {
-		if(e === Errors.accountDoesNotExist) {
-			res.status(400)
-			res.json({ errors: [e] })
-		} else {
-			console.log(e)
-			res.status(500)
-			res.json({
-				errors: [Errors.unknown]
-			})
-		}
-	}
-})
-
 router.all('*', (req, res, next) => {
 	if(req.session.username) {
 		next()
@@ -226,32 +183,13 @@ router.all('*', (req, res, next) => {
 	}
 })
 
-let upload = multer({ storage: multer.memoryStorage() })
-router.post('/:username/picture', upload.single('picture'), async (req, res) => {
+router.post('/:username/picture', async (req, res) => {
 	try {
 		if(req.session.username !== req.params.username) {
 			throw Errors.requestNotAuthorized
 		} else {
 			let user = await User.findById(req.session.UserId)
-			let picture = await ProfilePicture.findOne({
-				where: { UserId: user.id}
-			})
-
-			let pictureObj = {
-				file: req.file.buffer,
-				mimetype: req.file.mimetype
-			}
-			
-			//No picture set yet
-			if(!picture) {
-				picture = await ProfilePicture.create(pictureObj)
-				await picture.setUser(user)
-				await user.update({
-					picture: '/api/v1/user/' + req.session.username + '/picture'
-				})
-			} else {
-				await ProfilePicture.update(pictureObj)
-			}
+			await user.update({ picture: req.body.picture })
 
 			res.json(user.toJSON())
 		}
@@ -274,41 +212,6 @@ router.post('/:username/picture', upload.single('picture'), async (req, res) => 
 		}
 	}
 })
-
-router.delete('/:username/picture', async (req, res) => {
-	try {
-		if(req.session.username !== req.params.username) {
-			throw Errors.requestNotAuthorized
-		} else {
-			let user = await User.findById(req.session.UserId)
-			let picture = await ProfilePicture.findOne({
-				where: { UserId: user.id}
-			})
-
-			await user.update({
-				picture: null
-			})
-			await picture.destroy()
-
-			res.json(user.toJSON())
-		}
-	} catch (e) {
-		if(e === Errors.requestNotAuthorized) {
-			res.status(401)
-			res.json({
-				errors: [e]
-			})
-		} else {
-			console.log(e)
-
-			res.status(500)
-			res.json({
-				errors: [Errors.unknown]
-			})
-		}
-	}
-})
-
 
 router.put('/:username', async (req, res) => {
 	try {
