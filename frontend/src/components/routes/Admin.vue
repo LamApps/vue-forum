@@ -49,12 +49,6 @@
 						description: 'View and respond to user reports',
 						icon: 'fa-exclamation-circle'
 					},
-					{
-						title: 'Users',
-						route: 'users',
-						description: 'View current user accounts',
-						icon: 'fa-user-circle'
-					}
 				]
 			}
 		},
